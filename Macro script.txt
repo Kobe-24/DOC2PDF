@@ -1,0 +1,76 @@
+
+Sub DOCPDF()
+'
+' DOC2PDF Macro
+'
+'
+    Dim directory As String
+    directory = "C:\Convert"
+  
+    Dim fso, newFile, folder, files
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    
+    Set folder = fso.GetFolder(directory)
+    Set files = folder.files
+    
+    For Each file In files
+        
+        Dim newName As String
+        newName = ""
+        If StringEndsWith(file.Path, "docx", vbTextCompare) Then
+            newName = Replace(file.Path, ".docx", ".pdf")
+        ElseIf StringEndsWith(file.Path, "doc", vbTextCompare) Then
+            newName = Replace(file.Path, ".doc", ".pdf")
+        Else
+            newName = "NoDoc"
+        End If
+        
+        If newName <> "NoDoc" Then
+                       
+        Documents.Open FileName:=file.Path, _
+            ConfirmConversions:=False, ReadOnly:=False, AddToRecentFiles:=False, _
+            PasswordDocument:="", PasswordTemplate:="", Revert:=False, _
+            WritePasswordDocument:="", WritePasswordTemplate:="", Format:= _
+            wdOpenFormatAuto, XMLTransform:=""
+            
+        ActiveDocument.ExportAsFixedFormat OutputFileName:=newName, _
+            ExportFormat:=wdExportFormatPDF, OpenAfterExport:=False, OptimizeFor:= _
+            wdExportOptimizeForPrint, Range:=wdExportAllDocument, From:=1, To:=1, _
+            Item:=wdExportDocumentContent, IncludeDocProps:=True, KeepIRM:=True, _
+            CreateBookmarks:=wdExportCreateNoBookmarks, DocStructureTags:=True, _
+            BitmapMissingFonts:=True, UseISO19005_1:=False
+        
+        ActiveDocument.Close
+        End If
+    Next
+End Sub
+
+
+
+Public Function StringEndsWith(ByVal strValue As String, _
+   CheckFor As String, Optional CompareType As VbCompareMethod _
+   = vbBinaryCompare) As Boolean
+ 'Determines if a string ends with the same characters as
+ 'CheckFor string
+ 
+ 'True if end with CheckFor, false otherwise
+
+ 'Case sensitive by default.  If you want non-case sensitive, set
+ 'last parameter to vbTextCompare
+ 
+  'Examples
+  'MsgBox StringEndsWith("Test", "ST") 'False
+  'MsgBox StringEndsWith("Test", "ST", vbTextCompare) 'True
+
+  Dim sCompare As String
+  Dim lLen As Long
+   
+  lLen = Len(CheckFor)
+  If lLen > Len(strValue) Then Exit Function
+  sCompare = Right(strValue, lLen)
+  StringEndsWith = StrComp(sCompare, CheckFor, CompareType) = 0
+
+End Function
+
+
+
